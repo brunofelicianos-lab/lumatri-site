@@ -140,6 +140,24 @@
   ]
 }
 </script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-D2VETC9MEW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-D2VETC9MEW');
+</script>
+<script>
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if(!a || typeof gtag !== 'function') return;
+    var h = a.getAttribute('href') || '';
+    if(h.indexOf('wa.me') > -1) gtag('event', 'clique_whatsapp', {link_url: h});
+    else if(h.indexOf('tel:') === 0) gtag('event', 'clique_telefone', {});
+    else if(h.indexOf('mailto:') === 0) gtag('event', 'clique_email', {});
+  });
+</script>
 </head>
 <body>
 
@@ -426,6 +444,7 @@ function enviarWhats(){
     v('material')?"*Material/espessura:* "+v('material'):null,
     v('qtd')?"*Quantidade:* "+v('qtd'):null,
     v('desc')?"*Descrição:* "+v('desc'):null].filter(Boolean);
+  if(typeof gtag==='function')gtag('event','generate_lead',{method:'formulario_whatsapp'});
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(linhas.join("\n")),"_blank");
 }
 </script>
