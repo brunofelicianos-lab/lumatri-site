@@ -1,0 +1,43 @@
+# LUMATRI Industrial
+
+> Corte a laser em chapa e tubo, dobra CNC e estampagem em Criciúma/SC, Brasil. Atende de peça única e protótipos à produção em série, para clientes B2B industriais de Criciúma e região sul de Santa Catarina.
+
+## Empresa
+
+- Nome fantasia: LUMATRI Industrial
+- Razão social: METAL MATRIZES SERVICES LTDA
+- CNPJ: 34.000.684/0001-43
+- Endereço: Rua Vilmar Manenti, 46 — Cidade Mineira Nova, Criciúma/SC, CEP 88806-279
+- Horário: segunda a sexta, 7h às 17h
+- WhatsApp/Telefone: +55 48 99124-0852
+- E-mail: contato@lumatriindustrial.com.br
+- Site: https://lumatriindustrial.com.br/
+- Instagram: https://www.instagram.com/lumatriindustrial/
+
+## Serviços
+
+- [Corte a Laser](https://lumatriindustrial.com.br/corte-a-laser.html): corte de precisão em chapas de aço carbono, aço galvanizado, aço inox e alumínio, direto do arquivo DXF ou DWG. Bordas limpas e aproveitamento otimizado de chapa (nesting).
+- [Corte de Tubo a Laser](https://lumatriindustrial.com.br/corte-de-tubo.html): furos, entalhes, cortes em ângulo e recortes complexos em tubos redondos, quadrados e retangulares — encaixes prontos para solda.
+- [Dobra CNC](https://lumatriindustrial.com.br/dobra.html): ângulos e raios controlados em dobradeira CNC, com repetibilidade garantida do protótipo à produção seriada.
+- [Estampagem](https://lumatriindustrial.com.br/estampagem.html): conformação, repuxo e furação em prensa, integradas ao corte e à dobra para entregar a peça metálica completa.
+
+## Capacidade técnica
+
+- 2 máquinas de corte a laser por fibra óptica de 3.000 W cada
+- Mesa de corte: 1.500 × 3.000 mm
+- Aço carbono: 0,5 a 19 mm
+- Aço galvanizado: 0,5 a 6 mm
+- Aço inox: 0,5 a 6 mm
+- Alumínio: 0,5 a 6 mm
+
+## Como pedir orçamento
+
+1. Envie o desenho (DXF, DWG ou PDF com cotas) pelo WhatsApp +55 48 99124-0852, com material, espessura e quantidade. Sem arquivo? Um esboço com medidas basta — a equipe faz o desenho técnico.
+2. Receba o orçamento com valor e prazo de entrega na própria conversa.
+3. Aprovado o orçamento, a peça entra na fila de produção e o cliente é avisado quando estiver pronta.
+
+## Atendimento
+
+- Peça única, protótipo ou produção em série
+- Área atendida: Criciúma e região, sul de Santa Catarina
+- Público: empresas (B2B) — metalúrgicas, cerâmicas, indústrias de plástico, agrícolas, serralherias e fabricantes de equipamentos
