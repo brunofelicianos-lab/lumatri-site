@@ -4,9 +4,10 @@
 
 ## Empresa
 
-- Nome fantasia: LUMATRI Industrial
-- Razão social: METAL MATRIZES SERVICES LTDA
+- Nome: LUMATRI Industrial
+- Razão social: LUMATRI INDUSTRIAL LTDA
 - CNPJ: 34.000.684/0001-43
+- Fundação: 24/06/2019
 - Endereço: Rua Vilmar Manenti, 46 — Cidade Mineira Nova, Criciúma/SC, CEP 88806-279
 - Horário: segunda a sexta, 7h às 17h
 - WhatsApp/Telefone: +55 48 99124-0852
