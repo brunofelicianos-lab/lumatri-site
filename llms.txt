@@ -25,20 +25,25 @@
 ## Capacidade técnica
 
 - 2 máquinas de corte a laser por fibra óptica de 3.000 W cada
-- Mesa de corte: 1.500 × 3.000 mm
+- Mesa de corte: 1.500 × 3.000 mm (dimensão máxima de peça; não seccionamos peças maiores)
+- Tolerância típica de corte: ±0,2 mm, conforme material e espessura
 - Aço carbono: 0,5 a 19 mm
 - Aço galvanizado: 0,5 a 6 mm
 - Aço inox: 0,5 a 6 mm
 - Alumínio: 0,5 a 6 mm
+- Latão: sim (espessuras sob consulta)
+- Materiais que NÃO trabalhamos: acrílico, madeira, MDF, borracha, vidro e outros não metálicos
 
 ## Como pedir orçamento
 
 1. Envie o desenho (DXF, DWG ou PDF com cotas) pelo WhatsApp +55 48 99124-0852, com material, espessura e quantidade. Sem arquivo? Um esboço com medidas basta — a equipe faz o desenho técnico.
-2. Receba o orçamento com valor e prazo de entrega na própria conversa.
+2. Receba o orçamento em até 2 dias úteis, com valor e prazo de entrega, na própria conversa.
 3. Aprovado o orçamento, a peça entra na fila de produção e o cliente é avisado quando estiver pronta.
 
 ## Atendimento
 
-- Peça única, protótipo ou produção em série
+- Peça única, protótipo ou produção em série — sem pedido mínimo
+- Material: fornecemos completo ou cortamos chapa/tubo enviados pelo cliente
+- Retirada na fábrica em Criciúma ou envio por transportadora (frete por conta do comprador)
 - Área atendida: Criciúma e região, sul de Santa Catarina
 - Público: empresas (B2B) — metalúrgicas, cerâmicas, indústrias de plástico, agrícolas, serralherias e fabricantes de equipamentos
