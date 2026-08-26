@@ -119,14 +119,75 @@
   gtag('config', 'G-D2VETC9MEW');
 </script>
 <script>
+(function(){
+  var K = 'lumatri_origem';
+  var CHAVES = ['gclid','wbraid','gbraid','msclkid','fbclid','utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+  function ler(){ try { return JSON.parse(sessionStorage.getItem(K) || 'null'); } catch(e){ return null; } }
+  function gravar(o){ try { sessionStorage.setItem(K, JSON.stringify(o)); } catch(e){} }
+  function pagina(){ return location.pathname.split('/').pop() || 'index.html'; }
+
+  function capturar(){
+    var sp, q = {}, tem = false;
+    try { sp = new URLSearchParams(location.search); } catch(e){ return; }
+    CHAVES.forEach(function(k){ var v = sp.get(k); if(v){ q[k] = v; tem = true; } });
+    var ja = ler();
+    if(!tem && ja) return;
+    q.pg = pagina();
+    q.ref = document.referrer || '';
+    gravar(q);
+  }
+  capturar();
+
+  window.lumatriOrigem = function(){
+    var o = ler() || {}, L = [];
+    var id = o.gclid || o.wbraid || o.gbraid;
+    if(id) L.push('Origem: Google Ads');
+    else if(o.msclkid) L.push('Origem: Microsoft Ads');
+    else if(o.fbclid) L.push('Origem: Meta');
+    else if(o.utm_source) L.push('Origem: ' + o.utm_source + (o.utm_medium ? ' / ' + o.utm_medium : ''));
+    else if(o.ref){
+      var h = '';
+      try { h = new URL(o.ref).hostname.replace(/^www\./,''); } catch(e){}
+      if(h && h.indexOf('lumatriindustrial') < 0) L.push('Origem: ' + h);
+    }
+    if(o.utm_campaign) L.push('Campanha: ' + o.utm_campaign);
+    if(o.utm_term)     L.push('Busca: ' + o.utm_term);
+    if(o.utm_content)  L.push('An\u00fancio: ' + o.utm_content);
+    if(o.pg && o.pg !== pagina()) L.push('Entrou por: ' + o.pg);
+    if(id) L.push('ID do clique: ' + id);
+    return L;
+  };
+
+  window.lumatriRodape = function(){
+    var L = window.lumatriOrigem();
+    L.push('Pediu em: ' + pagina());
+    return L;
+  };
+
   document.addEventListener('click', function(e){
     var a = e.target && e.target.closest ? e.target.closest('a') : null;
-    if(!a || typeof gtag !== 'function') return;
+    if(!a) return;
     var h = a.getAttribute('href') || '';
-    if(h.indexOf('wa.me') > -1) gtag('event', 'clique_whatsapp', {link_url: h});
-    else if(h.indexOf('tel:') === 0) gtag('event', 'clique_telefone', {});
-    else if(h.indexOf('mailto:') === 0) gtag('event', 'clique_email', {});
+    if(h.indexOf('wa.me') > -1){
+      if(!a.getAttribute('data-org')){
+        try {
+          var i = h.indexOf('?');
+          var base = i < 0 ? h : h.slice(0, i);
+          var t = '';
+          var m = /[?&]text=([^&]*)/.exec(h);
+          if(m){ try { t = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch(e2){ t = ''; } }
+          if(!t) t = 'Ol\u00e1! Quero um or\u00e7amento.';
+          var full = t + '\n\n\u2014 \u2014 \u2014\n' + window.lumatriRodape().join('\n');
+          a.setAttribute('href', base + '?text=' + encodeURIComponent(full));
+          a.setAttribute('data-org','1');
+        } catch(err){}
+      }
+      if(typeof gtag === 'function') gtag('event', 'clique_whatsapp', {link_url: h});
+    }
+    else if(h.indexOf('tel:') === 0){ if(typeof gtag === 'function') gtag('event', 'clique_telefone', {}); }
+    else if(h.indexOf('mailto:') === 0){ if(typeof gtag === 'function') gtag('event', 'clique_email', {}); }
   });
+})();
 </script>
 </head>
 <body>
@@ -307,6 +368,11 @@ function enviarWhats(){
     v('material')?"*Material/espessura:* "+v('material'):null,
     v('qtd')?"*Quantidade:* "+v('qtd'):null,
     v('desc')?"*Descrição:* "+v('desc'):null].filter(Boolean);
+  if(typeof window.lumatriRodape==='function'){
+    linhas.push("");
+    linhas.push("\u2014 \u2014 \u2014");
+    linhas = linhas.concat(window.lumatriRodape());
+  }
   if(typeof gtag==='function')gtag('event','generate_lead',{method:'formulario_whatsapp'});
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(linhas.join("\n")),"_blank");
 }
