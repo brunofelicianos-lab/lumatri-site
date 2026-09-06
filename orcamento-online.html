@@ -69,30 +69,60 @@
   }
   capturar();
 
+  var NOMES = {
+    'index.html': 'P\u00e1gina inicial',
+    'corte-a-laser.html': 'Corte a laser',
+    'corte-de-tubo.html': 'Corte de tubo',
+    'dobra.html': 'Dobra CNC',
+    'estampagem.html': 'Estampagem',
+    'empresa.html': 'A empresa',
+    'orcamento-online.html': 'Or\u00e7amento online'
+  };
+  var CANAIS = {
+    'instagram': 'IG',
+    'ficha-google': 'Ficha Google',
+    'facebook': 'FB',
+    'linkedin': 'LinkedIn',
+    'youtube': 'YouTube',
+    'email': 'E-mail'
+  };
+  var SITES = {
+    'google.com': 'Busca Google',
+    'google.com.br': 'Busca Google',
+    'bing.com': 'Busca Bing',
+    'duckduckgo.com': 'Busca DuckDuckGo',
+    'instagram.com': 'IG',
+    'l.instagram.com': 'IG',
+    'facebook.com': 'FB',
+    'l.facebook.com': 'FB',
+    'lm.facebook.com': 'FB',
+    'linkedin.com': 'LinkedIn'
+  };
+  function nomePagina(p){
+    return NOMES[p] || p.replace(/\.html$/,'').replace(/-/g,' ');
+  }
+
   window.lumatriOrigem = function(){
-    var o = ler() || {}, L = [];
-    var id = o.gclid || o.wbraid || o.gbraid;
-    if(id) L.push('Origem: Google Ads');
-    else if(o.msclkid) L.push('Origem: Microsoft Ads');
-    else if(o.fbclid) L.push('Origem: Meta');
-    else if(o.utm_source) L.push('Origem: ' + o.utm_source + (o.utm_medium ? ' / ' + o.utm_medium : ''));
+    var o = ler() || {};
+    var id = o.gclid || o.wbraid || o.gbraid || o.msclkid || '';
+    var canal = '';
+    if(o.gclid || o.wbraid || o.gbraid) canal = 'AN Google';
+    else if(o.msclkid) canal = 'AN Bing';
+    else if(o.fbclid) canal = 'IG/FB';
+    else if(o.utm_source) canal = CANAIS[o.utm_source.toLowerCase()] || o.utm_source;
     else if(o.ref){
       var h = '';
       try { h = new URL(o.ref).hostname.replace(/^www\./,''); } catch(e){}
-      if(h && h.indexOf('lumatriindustrial') < 0) L.push('Origem: ' + h);
+      if(h && h.indexOf('lumatriindustrial') < 0) canal = SITES[h] || h;
     }
-    if(o.utm_campaign) L.push('Campanha: ' + o.utm_campaign);
-    if(o.utm_term)     L.push('Busca: ' + o.utm_term);
-    if(o.utm_content)  L.push('Anúncio: ' + o.utm_content);
-    if(o.pg && o.pg !== pagina()) L.push('Entrou por: ' + o.pg);
-    if(id) L.push('ID do clique: ' + id);
-    return L;
+    return { canal: canal || 'Site', id: id };
   };
 
   window.lumatriRodape = function(){
-    var L = window.lumatriOrigem();
-    L.push('Pediu em: ' + pagina());
-    return L;
+    var o = window.lumatriOrigem();
+    var linha = o.canal + ' \u00b7 ' + nomePagina(pagina());
+    if(o.id) linha += ' \u00b7 #' + String(o.id).slice(0, 10);
+    return [linha];
   };
 
   document.addEventListener('click', function(e){
@@ -108,7 +138,7 @@
           var m = /[?&]text=([^&]*)/.exec(h);
           if(m){ try { t = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch(e2){ t = ''; } }
           if(!t) t = 'Olá! Quero um orçamento.';
-          var full = t + '\n\n— — —\n' + window.lumatriRodape().join('\n');
+          var full = t + '\n\n' + window.lumatriRodape().join('\n');
           a.setAttribute('href', base + '?text=' + encodeURIComponent(full));
           a.setAttribute('data-org','1');
         } catch(err){}
@@ -307,7 +337,7 @@ var v = function(id){ var el = document.getElementById(id); return (el && el.val
 function abrirWhatsApp(linhas, comOrigem){
   if (comOrigem && typeof window.lumatriRodape === 'function') {
     var origem = window.lumatriRodape();
-    if (origem.length) linhas = linhas.concat(["", "— — —"], origem);
+    if (origem.length) linhas = linhas.concat([""], origem);
   }
   window.open("https://wa.me/" + num + "?text=" + encodeURIComponent(linhas.join("\n")), "_blank");
 }
@@ -321,7 +351,7 @@ document.getElementById('formEtapa1').addEventListener('submit', function(e){
   if (!v('nome')) { var nm = document.getElementById('nome'); if (nm) nm.focus(); return; }
   if (!v('telefone')) { var tf = document.getElementById('telefone'); if (tf) tf.focus(); return; }
 
-  var linhas = ["*Solicitação de orçamento — Landing Page LUMATRI*", "", "*Nome:* " + v('nome'),
+  var linhas = ["*Solicitação de orçamento — LP LUMATRI*", "", "*Nome:* " + v('nome'),
     "*Telefone:* " + v('telefone'), v('empresa') ? "*Empresa:* " + v('empresa') : null].filter(Boolean);
 
   if (typeof gtag === 'function') gtag('event', 'generate_lead', {method: 'landing_page_whatsapp'});
