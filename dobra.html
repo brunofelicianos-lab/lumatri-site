@@ -151,7 +151,7 @@
 <script>
 (function(){
   var K = 'lumatri_origem';
-  var CHAVES = ['gclid','wbraid','gbraid','msclkid','fbclid','utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+  var CHAVES = ['gclid','wbraid','gbraid','msclkid','fbclid','utm_source','utm_medium','utm_campaign','utm_term','utm_content','matchtype','device'];
   function ler(){ try { return JSON.parse(sessionStorage.getItem(K) || 'null'); } catch(e){ return null; } }
   function gravar(o){ try { sessionStorage.setItem(K, JSON.stringify(o)); } catch(e){} }
   function pagina(){ return location.pathname.split('/').pop() || 'index.html'; }
@@ -219,9 +219,40 @@
 
   window.lumatriRodape = function(){
     var o = window.lumatriOrigem();
-    var linha = o.canal + ' \u00b7 ' + nomePagina(pagina());
-    if(o.id) linha += ' \u00b7 #' + String(o.id).slice(0, 10);
-    return [linha];
+    return [o.canal + ' \u00b7 ' + nomePagina(pagina())];
+  };
+
+  // O dado de origem completo (gclid, UTMs, dispositivo) vai para o CRM, nunca
+  // para o texto do WhatsApp: quem l\u00ea a mensagem \u00e9 o cliente. \u00c9 o gclid guardado
+  // aqui que permite, depois, devolver or\u00e7amento e venda ao Google Ads.
+  var CRM = 'https://lumatri-hub.pages.dev/api/ingest';
+  window.lumatriCRM = function(pedido){
+    try {
+      var o = ler() || {};
+      var d = {
+        nome: pedido.nome || '', telefone: pedido.telefone || '',
+        empresa: pedido.empresa || '', cidade: pedido.cidade || '',
+        email: pedido.email || '', servico: pedido.servico || '',
+        material: pedido.material || '', quantidade: pedido.quantidade || '',
+        descricao: pedido.descricao || '', recorrencia: pedido.recorrencia || '',
+        desenho: pedido.desenho || '', prazo: pedido.prazo || '',
+        site_url: pedido.site_url || '',
+        complemento: pedido.complemento ? 1 : 0,
+        canal: window.lumatriOrigem().canal,
+        pagina_entrada: o.pg || pagina(),
+        pagina_pedido: pagina(),
+        referrer: o.ref || '',
+        dispositivo: o.device || (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop')
+      };
+      CHAVES.forEach(function(k){ if(k !== 'device' && o[k]) d[k] = o[k]; });
+      // sem await: a chamada precisa sair DENTRO do clique, sen\u00e3o o navegador
+      // bloqueia o window.open que vem logo depois. keepalive garante o envio.
+      fetch(CRM, {
+        method: 'POST', mode: 'cors', keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(d)
+      })['catch'](function(){});
+    } catch(e){}
   };
 
   document.addEventListener('click', function(e){
@@ -372,6 +403,11 @@
         <div style="margin-bottom:16px"><label for="empresa" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#8A8F98;margin-bottom:8px">Empresa (opcional)</label><input id="empresa" placeholder="Nome da empresa" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px" class="dcf-14"></div>
       </div>
       <div class="qf-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="margin-bottom:16px"><label for="telefone" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#8A8F98;margin-bottom:8px">WhatsApp</label><input id="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(48) 99999-9999" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px" class="dcf-13"></div>
+        <div style="margin-bottom:16px"><label for="cidade" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#8A8F98;margin-bottom:8px">Cidade</label><input id="cidade" autocomplete="address-level2" placeholder="Ex.: Criciúma" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px" class="dcf-13"></div>
+      </div>
+      <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;width:0;overflow:hidden" aria-hidden="true"><label for="site_url">Não preencha este campo</label><input id="site_url" name="site_url" tabindex="-1" autocomplete="off"></div>
+      <div class="qf-row" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div style="margin-bottom:16px"><label for="servico" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#8A8F98;margin-bottom:8px">Serviço</label><select id="servico" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px"><option>Corte a laser</option><option>Corte de tubo</option><option selected="">Dobra</option><option>Estampagem</option><option>Corte + dobra</option><option>Outro</option></select></div>
         <div style="margin-bottom:16px"><label for="material" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#8A8F98;margin-bottom:8px">Material / espessura</label><input id="material" placeholder="Ex.: aço carbono 3mm" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px" class="dcf-15"></div>
       </div>
@@ -429,9 +465,13 @@ function toggleMenu(){var el=document.getElementById('navlinks');if(el)el.classL
 function enviarWhats(){
   var num="5548991240852";
   var v=function(id){var e=document.getElementById(id);return (e&&e.value||'').trim();};
+  if(v('site_url')) return;                       // campo-armadilha: só robô preenche
   if(!v('nome')){var nm=document.getElementById('nome');if(nm)nm.focus();return;}
+  if(!v('telefone')){var tf=document.getElementById('telefone');if(tf)tf.focus();return;}
   var linhas=["*Solicitação de orçamento — Site LUMATRI*","","*Nome:* "+v('nome'),
-    v('empresa')?"*Empresa:* "+v('empresa'):null,"*Serviço:* "+v('servico'),
+    "*Telefone:* "+v('telefone'),
+    v('empresa')?"*Empresa:* "+v('empresa'):null,
+    v('cidade')?"*Cidade:* "+v('cidade'):null,"*Serviço:* "+v('servico'),
     v('material')?"*Material/espessura:* "+v('material'):null,
     v('qtd')?"*Quantidade:* "+v('qtd'):null,
     v('desc')?"*Descrição:* "+v('desc'):null].filter(Boolean);
@@ -439,6 +479,10 @@ function enviarWhats(){
     linhas.push("");
     linhas = linhas.concat(window.lumatriRodape());
   }
+  if(typeof window.lumatriCRM==='function') window.lumatriCRM({
+    nome:v('nome'), telefone:v('telefone'), empresa:v('empresa'), cidade:v('cidade'),
+    servico:v('servico'), material:v('material'), quantidade:v('qtd'), descricao:v('desc')
+  });
   if(typeof gtag==='function')gtag('event','generate_lead',{method:'formulario_whatsapp'});
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(linhas.join("\n")),"_blank");
 }
