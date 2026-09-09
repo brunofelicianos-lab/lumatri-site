@@ -606,8 +606,21 @@ function enviarWhats(){
   var num="5548991240852";
   var v=function(id){var e=document.getElementById(id);return (e&&e.value||'').trim();};
   if(v('site_url')) return;                       // campo-armadilha: só robô preenche
-  if(!v('nome')){var nm=document.getElementById('nome');if(nm)nm.focus();return;}
-  if(!v('telefone')){var tf=document.getElementById('telefone');if(tf)tf.focus();return;}
+  var aviso=function(id,texto){
+    var e=document.getElementById(id); if(!e) return;
+    var m=document.getElementById(id+'_erro');
+    if(!m){ m=document.createElement('p'); m.id=id+'_erro';
+      m.style.cssText='color:#E2231A;font-size:.82rem;margin:6px 0 0';
+      e.parentNode.insertBefore(m,e.nextSibling); }
+    m.textContent=texto; e.style.borderColor='#E2231A'; e.focus();
+  };
+  var limpa=function(id){
+    var m=document.getElementById(id+'_erro'); if(m) m.textContent='';
+    var e=document.getElementById(id); if(e) e.style.borderColor='';
+  };
+  limpa('nome'); limpa('telefone');
+  if(!v('nome')){ aviso('nome','Preencha seu nome.'); return; }
+  if(!v('telefone')){ aviso('telefone','Preencha seu telefone ou WhatsApp.'); return; }
   var linhas=["*Solicitação de orçamento — Site LUMATRI*","","*Nome:* "+v('nome'),
     "*Telefone:* "+v('telefone'),
     v('empresa')?"*Empresa:* "+v('empresa'):null,
