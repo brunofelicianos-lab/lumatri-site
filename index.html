@@ -225,10 +225,13 @@ src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
     'empresa.html': 'A empresa',
     'orcamento-online.html': 'Or\u00e7amento online'
   };
+  // Os nomes abaixo viram texto no WhatsApp e sao o termo de busca do comercial.
+  // Regra: nome unico, sem sigla e sem palavra que apareca em conversa normal
+  // ("IG" e "Site" davam falso positivo na busca).
   var CANAIS = {
-    'instagram': 'IG',
+    'instagram': 'Instagram',
     'ficha-google': 'Ficha Google',
-    'facebook': 'FB',
+    'facebook': 'Facebook',
     'linkedin': 'LinkedIn',
     'youtube': 'YouTube',
     'email': 'E-mail'
@@ -236,14 +239,24 @@ src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
   var SITES = {
     'google.com': 'Busca Google',
     'google.com.br': 'Busca Google',
+    'maps.google.com': 'Ficha Google',
+    'business.google.com': 'Ficha Google',
     'bing.com': 'Busca Bing',
     'duckduckgo.com': 'Busca DuckDuckGo',
-    'instagram.com': 'IG',
-    'l.instagram.com': 'IG',
-    'facebook.com': 'FB',
-    'l.facebook.com': 'FB',
-    'lm.facebook.com': 'FB',
-    'linkedin.com': 'LinkedIn'
+    'instagram.com': 'Instagram',
+    'l.instagram.com': 'Instagram',
+    'facebook.com': 'Facebook',
+    'l.facebook.com': 'Facebook',
+    'lm.facebook.com': 'Facebook',
+    'linkedin.com': 'LinkedIn',
+    // Buscadores de IA: em 11/09/2026 um lead chegou por chatgpt.com e caiu no
+    // fallback de hostname cru. Mapeados para virarem canal com nome proprio.
+    'chatgpt.com': 'ChatGPT',
+    'chat.openai.com': 'ChatGPT',
+    'perplexity.ai': 'Perplexity',
+    'gemini.google.com': 'Gemini',
+    'copilot.microsoft.com': 'Copilot',
+    'claude.ai': 'Claude'
   };
   function nomePagina(p){
     return NOMES[p] || p.replace(/\.html$/,'').replace(/-/g,' ');
@@ -253,21 +266,84 @@ src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
     var o = ler() || {};
     var id = o.gclid || o.wbraid || o.gbraid || o.msclkid || '';
     var canal = '';
-    if(o.gclid || o.wbraid || o.gbraid) canal = 'AN Google';
-    else if(o.msclkid) canal = 'AN Bing';
-    else if(o.fbclid) canal = 'IG/FB';
+    if(o.gclid || o.wbraid || o.gbraid) canal = 'Google Ads';
+    else if(o.msclkid) canal = 'Microsoft Ads';
+    else if(o.fbclid) canal = 'Instagram/Facebook';
     else if(o.utm_source) canal = CANAIS[o.utm_source.toLowerCase()] || o.utm_source;
     else if(o.ref){
       var h = '';
       try { h = new URL(o.ref).hostname.replace(/^www\./,''); } catch(e){}
       if(h && h.indexOf('lumatriindustrial') < 0) canal = SITES[h] || h;
     }
-    return { canal: canal || 'Site', id: id };
+    return { canal: canal || 'Acesso direto', id: id };
   };
 
-  window.lumatriRodape = function(){
-    var o = window.lumatriOrigem();
-    return [o.canal + ' \u00b7 ' + nomePagina(pagina())];
+  // Codigo de origem, colado no fim da frase entre chaves: {LUM-P-GA-CL-B}
+  //                                                          |  | |  |  |
+  //   veio do site --------------------------------------------+ |  |  |
+  //   P pago / N nao pago ---------------------------------------+  |  |
+  //   canal: GA MA ME IG GO FG LI YT ML IA OU DI -------------------+  |
+  //   pagina: HO CL CT DO ES EM OR ------------------------------------+
+  //   onde clicou: F formulario, V botao verdinho, B botao da pagina ---+
+  //
+  // Buscas no WhatsApp: "{LUM" = tudo do site, "LUM-P" = so pago,
+  // "LUM-N" = so nao pago, "-V}" = botao verdinho, "-F}" = formulario.
+  var PAG_COD = {
+    'index.html': 'HO', 'corte-a-laser.html': 'CL', 'corte-de-tubo.html': 'CT',
+    'dobra.html': 'DO', 'estampagem.html': 'ES', 'empresa.html': 'EM',
+    'orcamento-online.html': 'OR'
+  };
+  var CANAL_COD = {
+    'Google Ads': 'GA', 'Microsoft Ads': 'MA',
+    'Instagram/Facebook': 'ME', 'Facebook': 'ME', 'Instagram': 'IG',
+    'LinkedIn': 'LI', 'YouTube': 'YT', 'E-mail': 'ML',
+    'Busca Google': 'GO', 'Busca Bing': 'GO', 'Busca DuckDuckGo': 'GO',
+    'Ficha Google': 'FG',
+    'ChatGPT': 'IA', 'Perplexity': 'IA', 'Gemini': 'IA', 'Copilot': 'IA', 'Claude': 'IA',
+    'Acesso direto': 'DI'
+  };
+
+  // Pago so quando o clique traz identificador de anuncio, ou quando a UTM diz
+  // que e midia paga. fbclid sozinho NAO prova anuncio: link organico do
+  // Instagram tambem carrega fbclid, e marcar isso como pago inflaria o
+  // resultado da campanha.
+  var MEIO_PAGO = ['cpc','ppc','paid','paidsocial','paid_social','paid-social','display','cpm'];
+  window.lumatriPago = function(){
+    var o = ler() || {};
+    if(o.gclid || o.wbraid || o.gbraid || o.msclkid) return true;
+    return MEIO_PAGO.indexOf((o.utm_medium || '').toLowerCase()) > -1;
+  };
+
+  window.lumatriCodigo = function(botao){
+    return '{LUM-' + (window.lumatriPago() ? 'P' : 'N')
+      + '-' + (CANAL_COD[window.lumatriOrigem().canal] || 'OU')
+      + '-' + (PAG_COD[pagina()] || 'XX')
+      + '-' + (botao || 'B') + '}';
+  };
+
+  // Qual bot\u00e3o foi clicado. O flutuante e o da p\u00e1gina mandavam texto
+  // id\u00eantico, entao nao dava para separar um do outro na busca.
+  // O WhatsApp e o CRM falam vocabularios diferentes de proposito: o rodape usa
+  // nome que o comercial busca ("Busca Google"), o CRM usa a lista fechada de
+  // crm.html ("Organico"), que e o que ehAds() e os filtros comparam.
+  var CANAL_CRM = {
+    'Instagram/Facebook': 'Meta',
+    'Facebook': 'Meta',
+    'Busca Google': 'Org\u00e2nico',
+    'Busca Bing': 'Org\u00e2nico',
+    'Busca DuckDuckGo': 'Org\u00e2nico',
+    'Ficha Google': 'Google Maps',
+    'Acesso direto': 'Direto'
+  };
+  window.lumatriCanalCRM = function(canal){
+    return CANAL_CRM[canal] || canal;
+  };
+
+  window.lumatriBotao = function(a){
+    var d = a && a.getAttribute ? a.getAttribute('data-btn') : '';
+    if(d) return d;
+    var s = (a && a.getAttribute ? (a.getAttribute('style') || '') : '');
+    return s.indexOf('position:fixed') > -1 ? 'V' : 'B';
   };
 
   // O dado de origem completo (gclid, UTMs, dispositivo) vai para o CRM, nunca
@@ -286,7 +362,7 @@ src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
         desenho: pedido.desenho || '', prazo: pedido.prazo || '',
         site_url: pedido.site_url || '',
         complemento: pedido.complemento ? 1 : 0,
-        canal: window.lumatriOrigem().canal,
+        canal: window.lumatriCanalCRM(window.lumatriOrigem().canal),
         pagina_entrada: o.pg || pagina(),
         pagina_pedido: pagina(),
         referrer: o.ref || '',
@@ -316,7 +392,7 @@ src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
           var m = /[?&]text=([^&]*)/.exec(h);
           if(m){ try { t = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch(e2){ t = ''; } }
           if(!t) t = 'Ol\u00e1! Quero um or\u00e7amento.';
-          var full = t + '\n\n' + window.lumatriRodape().join('\n');
+          var full = t + ' ' + window.lumatriCodigo(window.lumatriBotao(a));
           a.setAttribute('href', base + '?text=' + encodeURIComponent(full));
           a.setAttribute('data-org','1');
         } catch(err){}
@@ -647,9 +723,8 @@ function enviarWhats(){
     v('material')?"*Material/espessura:* "+v('material'):null,
     v('qtd')?"*Quantidade:* "+v('qtd'):null,
     v('desc')?"*Descrição:* "+v('desc'):null].filter(Boolean);
-  if(typeof window.lumatriRodape==='function'){
-    linhas.push("");
-    linhas = linhas.concat(window.lumatriRodape());
+  if(typeof window.lumatriCodigo==='function' && linhas.length){
+    linhas[0] = linhas[0] + ' ' + window.lumatriCodigo('F');
   }
   if(typeof window.lumatriCRM==='function') window.lumatriCRM({
     nome:v('nome'), telefone:v('telefone'), empresa:v('empresa'), cidade:v('cidade'),
