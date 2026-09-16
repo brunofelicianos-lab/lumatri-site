@@ -178,6 +178,23 @@
   gtag('js', new Date());
   gtag('config', 'G-D2VETC9MEW');
 </script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '2102795770626520');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 <script>
 (function(){
   var K = 'lumatri_origem';
@@ -304,6 +321,7 @@
         } catch(err){}
       }
       if(typeof gtag === 'function') gtag('event', 'clique_whatsapp', {link_url: h});
+      if(typeof fbq==='function')fbq('track','Contact');
     }
     else if(h.indexOf('tel:') === 0){ if(typeof gtag === 'function') gtag('event', 'clique_telefone', {}); }
     else if(h.indexOf('mailto:') === 0){ if(typeof gtag === 'function') gtag('event', 'clique_email', {}); }
@@ -637,6 +655,7 @@ function enviarWhats(){
     servico:v('servico'), material:v('material'), quantidade:v('qtd'), descricao:v('desc')
   });
   if(typeof gtag==='function')gtag('event','generate_lead',{method:'formulario_whatsapp'});
+  if(typeof fbq==='function')fbq('track','Lead');
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(linhas.join("\n")),"_blank");
 }
 </script>
