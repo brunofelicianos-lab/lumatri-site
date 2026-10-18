@@ -548,7 +548,7 @@ src="https://www.facebook.com/tr?id=2102795770626520&ev=PageView&noscript=1"
   <p style="color:#6b6f77;font-size:.8rem;font-family:'Space Mono',monospace">© 2026 LUMATRI Industrial — <a href="index.html" style="text-decoration:underline;color:#8A8F98">Página inicial</a></p>
 </footer>
 
-<a href="https://wa.me/5548991240852?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20estampagem." target="_blank" rel="noopener" aria-label="Falar no WhatsApp" style="position:fixed;bottom:24px;right:24px;z-index:90;width:58px;height:58px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.5)" class="dch-12">
+<a href="https://wa.me/5548991240852?text=Ol%C3%A1!%20Quero%20um%20or%C3%A7amento%20de%20estampagem." target="_blank" rel="noopener" id="zap-flutuante" aria-label="Falar no WhatsApp" style="position:fixed;bottom:24px;right:24px;z-index:90;width:58px;height:58px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.5)" class="dch-12">
   <svg viewBox="0 0 32 32" style="width:30px;height:30px;fill:#fff" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.6.8 5 2.3 7L4 29l7.2-2.2c1.9 1 4 1.6 6.2 1.6h.6c6.6 0 12-5.4 12-12S22.6 3 16 3zm5.9 17.1c-.3.8-1.5 1.5-2.4 1.7-.6.1-1.4.2-4.2-.9-3.5-1.5-5.8-5-6-5.3-.2-.2-1.4-1.9-1.4-3.6s.9-2.6 1.2-2.9c.3-.3.7-.4 1-.4h.7c.2 0 .5-.1.8.6.3.8 1.1 2.6 1.2 2.8.1.2.2.4 0 .7-.1.3-.2.4-.4.7-.2.2-.4.5-.6.7-.2.2-.4.4-.2.8.2.4 1 1.7 2.2 2.7 1.5 1.4 2.8 1.8 3.2 2 .4.2.6.1.9-.1.2-.3 1-1.2 1.3-1.6.3-.4.5-.3.9-.2.4.1 2.4 1.1 2.8 1.3.4.2.7.3.8.5.1.2.1 1-.2 1.7z"></path></svg>
 </a>
 
@@ -594,6 +594,80 @@ function enviarWhats(){
   if(typeof fbq==='function')fbq('track','Lead');
   window.open("https://wa.me/"+num+"?text="+encodeURIComponent(linhas.join("\n")),"_blank");
 }
+</script>
+
+<!-- Caixa do botao verdinho: pede nome e telefone antes de abrir a conversa,
+     para o clique virar lead no CRM com a origem junto. -->
+<div id="zapbox" role="dialog" aria-modal="true" aria-labelledby="zapbox_t" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;z-index:100;background:rgba(0,0,0,.74);align-items:center;justify-content:center;padding:20px">
+  <div style="background:#16171B;border:1px solid #2E3138;border-radius:3px;width:100%;max-width:330px;padding:24px">
+    <p id="zapbox_t" style="font-family:'Chakra Petch',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:1rem;color:#E7E5DF;margin:0 0 6px">Falar no WhatsApp</p>
+    <p style="font-family:'Archivo',sans-serif;font-size:.86rem;color:#9B9FA7;margin:0 0 18px">Só o nome e o número. A conversa abre em seguida.</p>
+    <label for="zb_nome" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#9B9FA7;margin-bottom:6px">Nome</label>
+    <input id="zb_nome" placeholder="Seu nome" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px;margin-bottom:14px">
+    <label for="zb_tel" style="display:block;font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#9B9FA7;margin-bottom:6px">WhatsApp</label>
+    <input id="zb_tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(48) 99999-9999" style="width:100%;background:#0E0F12;border:1px solid #2E3138;color:#E7E5DF;padding:12px 14px;font-family:'Archivo',sans-serif;font-size:.95rem;border-radius:2px">
+    <p id="zb_erro" style="display:none;color:#E2231A;font-family:'Archivo',sans-serif;font-size:.82rem;margin:10px 0 0"></p>
+    <button id="zb_ok" style="width:100%;margin-top:18px;font-family:'Chakra Petch',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:.9rem;background:#E2231A;color:#fff;padding:14px;border:none;border-radius:2px;cursor:pointer">Abrir conversa &rarr;</button>
+    <button id="zb_x" style="width:100%;margin-top:10px;background:none;border:none;color:#9B9FA7;font-family:'Archivo',sans-serif;font-size:.82rem;cursor:pointer">Agora não</button>
+  </div>
+</div>
+<script>
+(function(){
+  var SERVICO = 'Estampagem';
+  var a = document.getElementById('zap-flutuante');
+  var cx = document.getElementById('zapbox');
+  if(!a || !cx) return;
+  var nome = document.getElementById('zb_nome');
+  var tel  = document.getElementById('zb_tel');
+  var erro = document.getElementById('zb_erro');
+
+  function fechar(){ cx.style.display = 'none'; }
+  a.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();          // impede o link de abrir direto
+    erro.style.display = 'none';
+    cx.style.display = 'flex';
+    setTimeout(function(){ try{ nome.focus(); }catch(err){} }, 50);
+  });
+  document.getElementById('zb_x').addEventListener('click', fechar);
+  cx.addEventListener('click', function(e){ if(e.target === cx) fechar(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && cx.style.display === 'flex') fechar();
+  });
+
+  function enviar(){
+    var n = (nome.value || '').trim();
+    var t = (tel.value  || '').trim();
+    if(!n){ erro.textContent = 'Preencha seu nome.'; erro.style.display = 'block'; nome.focus(); return; }
+    if(t.replace(/\D/g,'').length < 10){
+      erro.textContent = 'Preencha um WhatsApp com DDD.'; erro.style.display = 'block'; tel.focus(); return;
+    }
+    erro.style.display = 'none';
+
+    // o lead sai pelo mesmo caminho do formulario: o lumatriCRM ja anexa
+    // canal, gclid, UTMs, pagina e dispositivo.
+    try { if(typeof window.lumatriCRM === 'function')
+      window.lumatriCRM({ nome: n, telefone: t, servico: SERVICO }); } catch(err){}
+    if(typeof gtag === 'function') gtag('event','generate_lead',{method:'botao_whatsapp'});
+    if(typeof fbq  === 'function') fbq('track','Lead');
+
+    var h = a.getAttribute('href') || '';
+    var i = h.indexOf('?');
+    var base = i < 0 ? h : h.slice(0, i);
+    var frase = '';
+    var m = /[?&]text=([^&]*)/.exec(h);
+    if(m){ try { frase = decodeURIComponent(m[1].replace(/\+/g,' ')); } catch(err){} }
+    if(!frase) frase = 'Olá! Quero um orçamento.';
+    var cod = '';
+    try { cod = ' ' + window.lumatriCodigo('V'); } catch(err){}
+
+    fechar();
+    window.open(base + '?text=' + encodeURIComponent(frase + cod + '\n*Nome:* ' + n), '_blank');
+  }
+  document.getElementById('zb_ok').addEventListener('click', enviar);
+  [nome, tel].forEach(function(c){
+    c.addEventListener('keydown', function(e){ if(e.key === 'Enter') enviar(); });
+  });
+})();
 </script>
 </body>
 </html>
