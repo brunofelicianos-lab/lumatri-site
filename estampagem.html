@@ -572,9 +572,10 @@ function enviarWhats(){
     var m=document.getElementById(id+'_erro'); if(m) m.textContent='';
     var e=document.getElementById(id); if(e) e.style.borderColor='';
   };
-  limpa('nome'); limpa('telefone');
+  limpa('nome'); limpa('telefone'); limpa('cidade');
   if(!v('nome')){ aviso('nome','Preencha seu nome.'); return; }
   if(!v('telefone')){ aviso('telefone','Preencha seu telefone ou WhatsApp.'); return; }
+  if(!v('cidade')){ aviso('cidade','Preencha a cidade da empresa.'); return; }
   var linhas=["*Solicitação de orçamento — Site LUMATRI*","","*Nome:* "+v('nome'),
     "*Telefone:* "+v('telefone'),
     v('empresa')?"*Empresa:* "+v('empresa'):null,
